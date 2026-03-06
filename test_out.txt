@@ -1,0 +1,32 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.13.5, pytest-9.0.2, pluggy-1.6.0
+rootdir: C:\Users\Saridena\.gemini\antigravity\scratch\zonny-helper
+configfile: pyproject.toml
+plugins: anyio-4.12.1, cov-7.0.0, snapshot-0.9.0
+collected 27 items
+
+tests\unit\test_config_loader.py ........F....                           [ 48%]
+tests\unit\test_llm_providers.py ..............                          [100%]
+
+================================== FAILURES ===================================
+__________________ TestLoadConfig.test_project_config_loaded __________________
+
+self = <tests.unit.test_config_loader.TestLoadConfig object at 0x0000013D249CB130>
+tmp_path = WindowsPath('C:/Users/Saridena/AppData/Local/Temp/pytest-of-Saridena/pytest-3/test_project_config_loaded0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000013D24A03BF0>
+
+    def test_project_config_loaded(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        toml_content = '[llm]\nprovider = "gemini"\n'
+        (tmp_path / ".zonny.toml").write_text(toml_content)
+        monkeypatch.chdir(tmp_path)
+        config = load_config()
+>       assert config.llm.provider == "gemini"
+E       AssertionError: assert 'anthropic' == 'gemini'
+E         
+E         - gemini
+E         + anthropic
+
+C:\Users\Saridena\.gemini\antigravity\scratch\zonny-helper\tests\unit\test_config_loader.py:63: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/unit/test_config_loader.py::TestLoadConfig::test_project_config_loaded
+======================== 1 failed, 26 passed in 2.31s =========================

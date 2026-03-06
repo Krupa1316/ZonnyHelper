@@ -1,0 +1,53 @@
+# Zonny Helper — Project Configuration Example
+# Copy this file to .zonny.toml in your repository root and customize it.
+
+[general]
+output_format = "rich"   # "rich" | "json" | "markdown"
+
+# ── LLM Provider ──────────────────────────────────────────────────────────────
+[llm]
+provider = "anthropic"   # "anthropic" | "openai" | "gemini" | "ollama"
+
+[llm.anthropic]
+api_key = ""                       # or set ANTHROPIC_API_KEY env var
+model = "claude-sonnet-4-20250514"
+max_tokens = 4096
+
+[llm.openai]
+api_key = ""                       # or set OPENAI_API_KEY env var
+model = "gpt-4o"
+max_tokens = 4096
+base_url = ""                      # leave empty, or set for Azure / custom endpoints
+
+[llm.gemini]
+api_key = ""                       # or set GOOGLE_API_KEY env var
+model = "gemini-2.0-flash"
+max_tokens = 4096
+
+[llm.ollama]
+host = "http://localhost:11434"    # Ollama REST API URL
+model = "llama3"                   # any model you've pulled: ollama pull llama3
+max_tokens = 4096
+
+# ── Git Settings ──────────────────────────────────────────────────────────────
+[git]
+commit_style = "conventional"      # "conventional" | "gitmoji" | "plain"
+auto_execute = false               # set true to auto-run `git commit` after generating
+default_base_branch = "main"
+
+# ── Tree Settings ─────────────────────────────────────────────────────────────
+[tree]
+languages = ["python", "javascript", "typescript", "java", "go"]
+ignore_patterns = [
+    "node_modules", ".venv", "__pycache__",
+    "dist", "build", ".git", "*.min.js",
+]
+max_file_size_kb = 500
+enrich_by_default = true           # set false to skip LLM enrichment by default
+
+[tree.db_patterns]
+sqlalchemy = true
+django_orm = true
+prisma     = true
+mongoose   = true
+raw_sql    = true
