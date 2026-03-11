@@ -5,7 +5,7 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://python.org)
 [![Status: Beta](https://img.shields.io/badge/status-beta-yellow.svg)](https://pypi.org/project/zonny/)
 
-> **We are looking for testers and contributors.**
+> **We are looking contributors.**
 > If you try Zonny and run into anything — bugs, confusing output, missing features — please [open an issue](https://github.com/Saridena/zonny/issues).
 > If you want to contribute code, see the [Contributing](#contributing) section at the bottom.
 
