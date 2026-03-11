@@ -6,8 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from zonny_helper.config.loader import _deep_merge, _find_project_config, load_config
-from zonny_helper.config.schema import ZonnyConfig
+from zonny_core.config.loader import _deep_merge, _find_project_config, load_config
+from zonny_core.config.schema import ZonnyConfig
 
 
 class TestDeepMerge:
@@ -37,7 +37,12 @@ class TestLoadConfig:
         config = load_config()
         assert isinstance(config, ZonnyConfig)
 
-    def test_default_provider_is_anthropic(self) -> None:
+    def test_default_provider_is_anthropic(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        # Isolate from any real config file so pure defaults apply
+        monkeypatch.setattr(
+            "zonny_core.config.loader._global_config_path",
+            lambda: tmp_path / "no-such-config.toml",
+        )
         config = load_config()
         assert config.llm.provider == "anthropic"
 

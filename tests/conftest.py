@@ -13,8 +13,8 @@ from typing import Iterator
 
 import pytest
 
-from zonny_helper.config.schema import ZonnyConfig
-from zonny_helper.llm.base import BaseLLMProvider
+from zonny_core.config.schema import ZonnyConfig
+from zonny_ai.llm.base import BaseLLMProvider
 
 
 class MockLLMProvider(BaseLLMProvider):

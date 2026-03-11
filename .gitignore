@@ -19,6 +19,9 @@ env/
 .vscode/
 *.code-workspace
 
+# Zonny runtime artifacts
+.zonny/
+
 # Testing / Coverage
 .pytest_cache/
 .coverage

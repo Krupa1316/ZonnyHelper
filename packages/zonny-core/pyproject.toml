@@ -1,0 +1,57 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "zonny-core"
+version = "0.2.0"
+description = "Zonny Core — deterministic CLI for deployment automation, codebase tree mapping, and git tooling. No API key required."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+keywords = ["cli", "deploy", "git", "codebase", "developer-tools", "automation"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Build Tools",
+    "Topic :: Utilities",
+]
+dependencies = [
+    "typer>=0.12",
+    "rich>=13",
+    "httpx>=0.27",
+    "pydantic>=2",
+    "pydantic-settings>=2",
+    "tomli>=2; python_version < '3.11'",
+    "tomli-w>=1.0",           # for writing TOML config files
+    "tree-sitter>=0.21",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8",
+    "pytest-cov",
+    "ruff",
+    "mypy",
+]
+resources = [
+    "psutil>=5.9",
+]
+
+[project.scripts]
+zonny = "zonny_core.cli:app"
+
+[project.urls]
+Homepage   = "https://github.com/Saridena/zonny"
+Repository = "https://github.com/Saridena/zonny"
+Issues     = "https://github.com/Saridena/zonny/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/zonny_core"]

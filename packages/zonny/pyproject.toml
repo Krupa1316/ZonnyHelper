@@ -1,0 +1,46 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "zonny"
+version = "0.2.0"
+description = "Zonny — one-command deploy automation, Cloudflare tunnel publishing, and AI-powered git/codebase tooling."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+keywords = ["cli", "deploy", "cloudflare", "git", "ai", "automation", "developer-tools"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Build Tools",
+    "Topic :: Utilities",
+]
+
+# Installing `zonny` pulls in both core (deploy engine) and ai (LLM features).
+dependencies = [
+    "zonny-core>=0.2.0",
+    "zonny-ai>=0.2.0",
+]
+
+[project.optional-dependencies]
+anthropic = ["anthropic>=0.30"]
+openai    = ["openai>=1.30"]
+gemini    = ["google-genai>=1.0"]
+all       = ["zonny[anthropic,openai,gemini]"]
+
+[project.urls]
+Homepage   = "https://github.com/Saridena/zonny"
+Repository = "https://github.com/Saridena/zonny"
+Issues     = "https://github.com/Saridena/zonny/issues"
+
+# No wheel packages — this is a pure meta-package with no source code.
+[tool.hatch.build.targets.wheel]
+packages = ["src/zonny"]

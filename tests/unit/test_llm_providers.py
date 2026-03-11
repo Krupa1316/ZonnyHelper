@@ -4,10 +4,10 @@ from __future__ import annotations
 import pytest
 
 from tests.conftest import MockLLMProvider
-from zonny_helper.config.schema import ZonnyConfig
-from zonny_helper.exceptions import ZonnyConfigError
-from zonny_helper.llm.base import BaseLLMProvider
-from zonny_helper.llm.router import SUPPORTED_PROVIDERS, get_provider
+from zonny_core.config.schema import ZonnyConfig
+from zonny_core.exceptions import ZonnyConfigError
+from zonny_ai.llm.base import BaseLLMProvider
+from zonny_ai.llm.router import SUPPORTED_PROVIDERS, get_provider
 
 
 class TestMockProvider:
@@ -56,20 +56,20 @@ class TestRouter:
     def test_override_takes_precedence(self) -> None:
         """get_provider with override='ollama' should return OllamaProvider even if config says anthropic."""
         config = ZonnyConfig()  # default provider is anthropic
-        from zonny_helper.llm.providers.ollama import OllamaProvider  # noqa: PLC0415
+        from zonny_ai.llm.providers.ollama import OllamaProvider  # noqa: PLC0415
         provider = get_provider(config, override="ollama")
         assert isinstance(provider, OllamaProvider)
 
     def test_anthropic_provider_instantiates(self) -> None:
         config = ZonnyConfig()
-        from zonny_helper.llm.providers.anthropic import AnthropicProvider  # noqa: PLC0415
+        from zonny_ai.llm.providers.anthropic import AnthropicProvider  # noqa: PLC0415
         provider = get_provider(config, override="anthropic")
         assert isinstance(provider, AnthropicProvider)
         assert provider.name().startswith("Anthropic")
 
     def test_openai_provider_instantiates(self) -> None:
         config = ZonnyConfig()
-        from zonny_helper.llm.providers.openai import OpenAIProvider  # noqa: PLC0415
+        from zonny_ai.llm.providers.openai import OpenAIProvider  # noqa: PLC0415
         provider = get_provider(config, override="openai")
         assert isinstance(provider, OpenAIProvider)
         assert provider.name().startswith("OpenAI")
@@ -93,3 +93,77 @@ class TestRouter:
         config.llm.openai.api_key = ""
         provider = get_provider(config, override="openai")
         assert provider.available() is False
+    def test_gemini_provider_instantiates(self) -> None:
+        config = ZonnyConfig()
+        from zonny_ai.llm.providers.gemini import GeminiProvider  # noqa: PLC0415
+        provider = get_provider(config, override="gemini")
+        assert isinstance(provider, GeminiProvider)
+        assert provider.name().startswith("Google Gemini")
+
+    def test_gemini_not_available_without_key(self) -> None:
+        config = ZonnyConfig()
+        config.llm.gemini.api_key = ""
+        provider = get_provider(config, override="gemini")
+        assert provider.available() is False
+
+    def test_gemini_available_with_key(self) -> None:
+        config = ZonnyConfig()
+        config.llm.gemini.api_key = "fake-test-key"
+        provider = get_provider(config, override="gemini")
+        assert provider.available() is True
+
+
+class TestProviderCacheIntegration:
+    """Verify providers read from / write to cache around API calls."""
+
+    def test_anthropic_uses_cache_on_hit(self, tmp_path, monkeypatch) -> None:  # type: ignore[no-untyped-def]
+        from pathlib import Path  # noqa: PLC0415
+        from unittest.mock import patch  # noqa: PLC0415
+
+        cache_dir = tmp_path / "llm_cache"
+        with patch("zonny_ai.llm.cache._cache_dir", return_value=cache_dir):
+            from zonny_ai.llm.cache import set_cached  # noqa: PLC0415
+            from zonny_ai.llm.providers.anthropic import AnthropicProvider  # noqa: PLC0415
+            from zonny_core.config.schema import AnthropicProviderConfig  # noqa: PLC0415
+
+            cfg = AnthropicProviderConfig(api_key="fake", model="claude-3-haiku-20240307")
+            provider = AnthropicProvider(cfg)
+
+            # Seed the cache
+            set_cached("anthropic", "claude-3-haiku-20240307", "2+2?", "", "4")
+
+            # generate() should return cached value without hitting the API
+            result = provider.generate("2+2?", system="")
+            assert result == "4"
+
+    def test_gemini_uses_cache_on_hit(self, tmp_path, monkeypatch) -> None:  # type: ignore[no-untyped-def]
+        from unittest.mock import patch  # noqa: PLC0415
+
+        cache_dir = tmp_path / "llm_cache"
+        with patch("zonny_ai.llm.cache._cache_dir", return_value=cache_dir):
+            from zonny_ai.llm.cache import set_cached  # noqa: PLC0415
+            from zonny_ai.llm.providers.gemini import GeminiProvider  # noqa: PLC0415
+            from zonny_core.config.schema import GeminiProviderConfig  # noqa: PLC0415
+
+            cfg = GeminiProviderConfig(api_key="fake", model="gemini-2.0-flash")
+            provider = GeminiProvider(cfg)
+
+            set_cached("gemini", "gemini-2.0-flash", "capital of France?", "", "Paris")
+            result = provider.generate("capital of France?", system="")
+            assert result == "Paris"
+
+    def test_openai_uses_cache_on_hit(self, tmp_path, monkeypatch) -> None:  # type: ignore[no-untyped-def]
+        from unittest.mock import patch  # noqa: PLC0415
+
+        cache_dir = tmp_path / "llm_cache"
+        with patch("zonny_ai.llm.cache._cache_dir", return_value=cache_dir):
+            from zonny_ai.llm.cache import set_cached  # noqa: PLC0415
+            from zonny_ai.llm.providers.openai import OpenAIProvider  # noqa: PLC0415
+            from zonny_core.config.schema import OpenAIProviderConfig  # noqa: PLC0415
+
+            cfg = OpenAIProviderConfig(api_key="fake", model="gpt-4o-mini")
+            provider = OpenAIProvider(cfg)
+
+            set_cached("openai", "gpt-4o-mini", "hello?", "", "hi there")
+            result = provider.generate("hello?", system="")
+            assert result == "hi there"
