@@ -1,4 +1,4 @@
-# Zonny
+# Zonny-Helper
 
 [![PyPI](https://img.shields.io/pypi/v/zonny.svg)](https://pypi.org/project/zonny/)
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
